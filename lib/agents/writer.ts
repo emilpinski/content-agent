@@ -31,7 +31,7 @@ export function makeWriterNode(keys: GraphKeys) {
   return async function writerNode(state: ContentStateType): Promise<Partial<ContentStateType>> {
     if (state.dryRun) return { articleMd: MOCK_ARTICLE };
 
-    const llm = makeLLM(keys, "claude-sonnet-4-6", 3000);
+    const llm = makeLLM(keys, "claude-sonnet-4-6", 6000);
 
     const prompt = `Jesteś ekspertem content marketingu. Napisz artykuł blogowy po polsku na temat: "${state.topic}".
 
