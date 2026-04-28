@@ -3,8 +3,8 @@ import type { GraphKeys } from "./graph";
 
 // OpenRouter uses stable model slugs — map Anthropic IDs to OR equivalents
 const OR_MODELS: Record<string, string> = {
-  "claude-haiku-4-5-20251001": "anthropic/claude-3-5-haiku-20241022",
-  "claude-sonnet-4-6":         "anthropic/claude-3-5-sonnet-20241022",
+  "claude-haiku-4-5-20251001": "anthropic/claude-3.5-haiku-20241022",
+  "claude-sonnet-4-6":         "anthropic/claude-3.5-sonnet-20241022",
   "claude-opus-4-7":           "anthropic/claude-3-opus-20240229",
 };
 
