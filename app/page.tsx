@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -179,7 +180,8 @@ export default function Home() {
       <header style={{ borderBottom: "1px solid var(--border)", padding: "1rem 2rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
         <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>✦</div>
         <span style={{ fontWeight: 600, fontSize: "1.1rem" }}>Content Agent</span>
-        <div style={{ marginLeft: "auto", display: "flex", gap: "0.5rem" }}>
+        <div style={{ marginLeft: "auto", display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <Link href="/settings" style={{ color: "var(--muted)", textDecoration: "none", fontSize: "0.8rem", padding: "0.3rem 0.75rem", border: "1px solid var(--border)", borderRadius: 6 }}>⚙ Ustawienia</Link>
           {(["single", "bulk"] as Mode[]).map((m) => (
             <button key={m} onClick={() => setMode(m)} style={{ background: mode === m ? "var(--accent)" : "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, padding: "0.3rem 0.75rem", color: "var(--text)", fontSize: "0.8rem", cursor: "pointer", fontWeight: mode === m ? 600 : 400 }}>
               {m === "single" ? "Pojedynczy" : "Bulk (CSV)"}
