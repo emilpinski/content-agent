@@ -2,8 +2,11 @@ import { ChatAnthropic } from "@langchain/anthropic";
 import type { GraphKeys } from "./graph";
 
 export function makeLLM(keys: GraphKeys, model: string, maxTokens: number) {
+  // Anthropic direct API takes priority — uses correct Claude 4.x model IDs
+  if (keys.anthropicKey) {
+    return new ChatAnthropic({ model, apiKey: keys.anthropicKey, maxTokens });
+  }
   if (keys.openrouterKey) {
-    // OpenRouter requires "anthropic/" prefix for Anthropic models
     const orModel = model.includes("/") ? model : `anthropic/${model}`;
     return new ChatAnthropic({
       model: orModel,
@@ -18,5 +21,5 @@ export function makeLLM(keys: GraphKeys, model: string, maxTokens: number) {
       },
     });
   }
-  return new ChatAnthropic({ model, apiKey: keys.anthropicKey, maxTokens });
+  throw new Error("Brak klucza API (Anthropic lub OpenRouter)");
 }
