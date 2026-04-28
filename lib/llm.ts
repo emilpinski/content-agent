@@ -5,8 +5,8 @@ import type { GraphKeys } from "./graph";
 // OpenRouter uses OpenAI-compatible API (/chat/completions), not Anthropic native (/messages)
 // Map Anthropic model IDs to OpenRouter slugs
 const OR_MODELS: Record<string, string> = {
-  "claude-haiku-4-5-20251001": "anthropic/claude-3.5-haiku-20241022",
-  "claude-sonnet-4-6":         "anthropic/claude-3.5-sonnet-20241022",
+  "claude-haiku-4-5-20251001": "anthropic/claude-3-haiku-20240307",
+  "claude-sonnet-4-6":         "anthropic/claude-3.5-sonnet",
   "claude-opus-4-7":           "anthropic/claude-3-opus-20240229",
 };
 
