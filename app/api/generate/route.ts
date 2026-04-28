@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
   // User-provided keys take precedence over env vars
   const anthropicKey: string = (apiKeys?.anthropicKey as string) || process.env.ANTHROPIC_API_KEY || "";
   const openrouterKey: string = (apiKeys?.openrouterKey as string) || process.env.OPENROUTER_API_KEY || "";
-  const searchProvider: string = (apiKeys?.searchProvider as string) || "brave";
-  const searchKey: string = (apiKeys?.braveKey as string) || (apiKeys?.tavilyKey as string) || process.env.BRAVE_SEARCH_KEY || process.env.TAVILY_API_KEY || "";
+  const searchProvider: string = (apiKeys?.searchProvider as string) || "tavily";
+  const searchKey: string = (apiKeys?.tavilyKey as string) || (apiKeys?.braveKey as string) || process.env.TAVILY_API_KEY || process.env.BRAVE_SEARCH_KEY || "";
 
   // Validate key format only when user-provided (env vars trusted)
   if (apiKeys?.anthropicKey && !isValidAnthropicKey(anthropicKey)) {

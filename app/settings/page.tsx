@@ -11,7 +11,7 @@ interface Settings {
   braveKey: string;
 }
 
-const DEFAULT: Settings = { anthropicKey: "", openrouterKey: "", searchProvider: "brave", tavilyKey: "", braveKey: "" };
+const DEFAULT: Settings = { anthropicKey: "", openrouterKey: "", searchProvider: "tavily", tavilyKey: "", braveKey: "" };
 const STORAGE_KEY = "ca-settings";
 
 function loadSettings(): Settings {
