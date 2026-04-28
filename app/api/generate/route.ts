@@ -22,11 +22,12 @@ export async function POST(req: NextRequest) {
 
   // User-provided keys take precedence over env vars
   const anthropicKey: string = (apiKeys?.anthropicKey as string) || process.env.ANTHROPIC_API_KEY || "";
+  const openrouterKey: string = (apiKeys?.openrouterKey as string) || process.env.OPENROUTER_API_KEY || "";
   const searchProvider: string = (apiKeys?.searchProvider as string) || "brave";
   const searchKey: string = (apiKeys?.braveKey as string) || (apiKeys?.tavilyKey as string) || process.env.BRAVE_SEARCH_KEY || process.env.TAVILY_API_KEY || "";
 
-  if (!anthropicKey) {
-    return new Response(JSON.stringify({ error: "Brak ANTHROPIC_API_KEY. Dodaj klucz w Ustawieniach." }), {
+  if (!anthropicKey && !openrouterKey) {
+    return new Response(JSON.stringify({ error: "Brak klucza API. Dodaj ANTHROPIC_API_KEY lub OPENROUTER_API_KEY w Ustawieniach." }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
       try {
         send(controller, encoder, { type: "progress", step: "researcher", message: "[Researcher] Szukam informacji..." });
 
-        const pipeline = buildGraph({ anthropicKey, searchProvider, searchKey });
+        const pipeline = buildGraph({ anthropicKey, openrouterKey, searchProvider, searchKey });
 
         // LangGraph streaming — each node completion triggers a stream chunk
         const stream_ = await pipeline.stream(

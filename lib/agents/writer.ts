@@ -1,6 +1,6 @@
-import { ChatAnthropic } from "@langchain/anthropic";
 import type { ContentStateType } from "../state";
 import type { GraphKeys } from "../graph";
+import { makeLLM } from "../llm";
 
 const MOCK_ARTICLE = `# Jak wybrać najlepszego fryzjera w Twoim mieście
 
@@ -31,7 +31,7 @@ export function makeWriterNode(keys: GraphKeys) {
   return async function writerNode(state: ContentStateType): Promise<Partial<ContentStateType>> {
     if (state.dryRun) return { articleMd: MOCK_ARTICLE };
 
-    const llm = new ChatAnthropic({ model: "claude-sonnet-4-6", apiKey: keys.anthropicKey, maxTokens: 3000 });
+    const llm = makeLLM(keys, "claude-sonnet-4-6", 3000);
 
     const prompt = `Jesteś ekspertem content marketingu. Napisz artykuł blogowy po polsku na temat: "${state.topic}".
 

@@ -1,6 +1,6 @@
-import { ChatAnthropic } from "@langchain/anthropic";
 import type { ContentStateType } from "../state";
 import type { GraphKeys } from "../graph";
+import { makeLLM } from "../llm";
 
 export function makeSeoCheckerNode(keys: GraphKeys) {
   return async function seoCheckerNode(state: ContentStateType): Promise<Partial<ContentStateType>> {
@@ -24,7 +24,7 @@ export function makeSeoCheckerNode(keys: GraphKeys) {
       };
     }
 
-    const llm = new ChatAnthropic({ model: "claude-haiku-4-5-20251001", apiKey: keys.anthropicKey, maxTokens: 1000 });
+    const llm = makeLLM(keys, "claude-haiku-4-5-20251001", 1000);
 
     const response = await llm.invoke(
       `Jesteś ekspertem SEO. Napisz raport SEO po polsku dla artykułu z frazą "${state.seoPhrase}".

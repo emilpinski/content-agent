@@ -1,6 +1,6 @@
-import { ChatAnthropic } from "@langchain/anthropic";
 import type { ContentStateType } from "../state";
 import type { GraphKeys } from "../graph";
+import { makeLLM } from "../llm";
 
 export function makeImagePromptNode(keys: GraphKeys) {
   return async function imagePromptNode(state: ContentStateType): Promise<Partial<ContentStateType>> {
@@ -10,11 +10,7 @@ export function makeImagePromptNode(keys: GraphKeys) {
     };
   }
 
-  const llm = new ChatAnthropic({
-    model: "claude-haiku-4-5-20251001",
-    apiKey: keys.anthropicKey,
-    maxTokens: 300,
-  });
+  const llm = makeLLM(keys, "claude-haiku-4-5-20251001", 300);
 
   const prompt = `Na podstawie poniższego artykułu wygeneruj dwa prompty do generatora obrazów AI (Midjourney / Flux):
 

@@ -7,6 +7,7 @@ import { makeImagePromptNode } from "./agents/imagePrompt";
 
 export interface GraphKeys {
   anthropicKey: string;
+  openrouterKey: string;
   searchProvider: string;
   searchKey: string;
 }

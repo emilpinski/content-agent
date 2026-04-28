@@ -22,7 +22,7 @@ interface BulkRow { topic: string; seoPhrase: string }
 interface BulkResult extends BulkRow { article: string; seoReport: string; imagePrompt: string; status: "pending" | "running" | "done" | "error" }
 
 const PIPELINE_STEPS = [
-  { id: "researcher", label: "Researcher", desc: "Szuka informacji (Tavily)" },
+  { id: "researcher", label: "Researcher", desc: "Szuka informacji (Brave Search)" },
   { id: "writer", label: "Writer", desc: "Pisze artykuł (Sonnet)" },
   { id: "seo", label: "SEO Checker", desc: "Analizuje SEO (Haiku)" },
   { id: "image_prompt", label: "Image Prompt", desc: "Generuje prompt obrazu" },
@@ -66,6 +66,7 @@ export default function Home() {
   const [bulkResults, setBulkResults] = useState<BulkResult[]>([]);
   const [bulkRunning, setBulkRunning] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const resultRef = useRef<HTMLDivElement | null>(null);
 
   const runGeneration = useCallback(async (t: string, s: string, dry: boolean): Promise<{ article: string; seoReport: string; imagePrompt: string }> => {
     let apiKeys: Record<string, string> | undefined;
@@ -127,6 +128,7 @@ export default function Home() {
       setSeoReport(result.seoReport);
       setImagePrompt(result.imagePrompt);
       setStep("done");
+      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
       const item: HistoryItem = {
         id: Date.now().toString(), topic, seoPhrase,
         article: result.article, seoReport: result.seoReport, imagePrompt: result.imagePrompt,
@@ -265,7 +267,7 @@ export default function Home() {
               )}
 
               {(step === "done" || step === "error") && article && (
-                <>
+                <div ref={resultRef}>
                   <div style={{ display: "flex", borderBottom: "1px solid var(--border)", padding: "0 1.5rem", alignItems: "center" }}>
                     {(["article", "seo", "image"] as Tab[]).map((tab) => (
                       <button key={tab} onClick={() => setActiveTab(tab)}
@@ -291,7 +293,7 @@ export default function Home() {
                       </ReactMarkdown>
                     )}
                   </div>
-                </>
+                </div>
               )}
             </div>
           </div>

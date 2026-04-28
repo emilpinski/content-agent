@@ -1,7 +1,7 @@
-import { ChatAnthropic } from "@langchain/anthropic";
 import { tavily } from "@tavily/core";
 import type { ContentStateType } from "../state";
 import type { GraphKeys } from "../graph";
+import { makeLLM } from "../llm";
 
 const MOCK_RESEARCH = `
 ## Mock Research Notes (dry-run)
@@ -47,7 +47,7 @@ export function makeResearcherNode(keys: GraphKeys) {
   return async function researcherNode(state: ContentStateType): Promise<Partial<ContentStateType>> {
     if (state.dryRun) return { researchNotes: MOCK_RESEARCH };
 
-    const llm = new ChatAnthropic({ model: "claude-haiku-4-5-20251001", apiKey: keys.anthropicKey, maxTokens: 1500 });
+    const llm = makeLLM(keys, "claude-haiku-4-5-20251001", 1500);
     const query = `${state.topic} ${state.seoPhrase} porady wskazówki`;
 
     let snippets = "";
