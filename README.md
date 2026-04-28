@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Content Agent UI
 
-## Getting Started
+AI-powered content generation pipeline built with LangGraph. Generates SEO-optimized Polish articles using a 4-agent workflow.
 
-First, run the development server:
+**Live:** [content-agent-ui.vercel.app](https://content-agent-ui.vercel.app)
+
+---
+
+## How it works
+
+Enter a topic and SEO phrase — the pipeline runs 4 agents in sequence:
+
+1. **Researcher** — searches the web (Tavily or Brave Search) and extracts key facts
+2. **Writer** — writes a full Polish article (1000–1500+ words) based on research
+3. **SEO Checker** — analyzes the article and generates meta title, meta description, keyword density report
+4. **Image Prompt** — generates a detailed image prompt for a thumbnail/social graphic
+
+Progress is streamed in real time via SSE.
+
+---
+
+## Setup
+
+### 1. API Keys
+
+You need at least one LLM provider and one search provider:
+
+| Key | Where to get | Required |
+|-----|-------------|---------|
+| OpenRouter API Key | [openrouter.ai](https://openrouter.ai) | Recommended |
+| Anthropic API Key | [console.anthropic.com](https://console.anthropic.com) | Alternative |
+| Tavily API Key | [tavily.com](https://tavily.com) — 1000 req/mo free | Recommended |
+| Brave Search API Key | [brave.com/search/api](https://brave.com/search/api) — 2000 req/mo free | Alternative |
+
+### 2. Enter keys in the app
+
+Go to ⚙ Settings → paste your keys → Save. Keys are stored in your browser (localStorage) and sent to the server only during generation. The server does not store them.
+
+### 3. Generate
+
+Enter topic + SEO phrase → click Generate → wait ~60–90s for the full pipeline to complete.
+
+---
+
+## Models used (via OpenRouter)
+
+| Agent | Model |
+|-------|-------|
+| Researcher | claude-haiku-4.5 |
+| Writer | claude-sonnet-4.6 |
+| SEO Checker | claude-haiku-4.5 |
+| Image Prompt | claude-haiku-4.5 |
+
+---
+
+## Tech stack
+
+- **Next.js 15** (App Router, Node.js runtime)
+- **LangGraph** — agent orchestration
+- **LangChain OpenAI** — OpenRouter-compatible LLM client
+- **Tavily / Brave Search** — web research
+- **Supabase** (optional) — article history storage
+- **Vercel** — hosting (max 300s function timeout)
+
+---
+
+## Self-hosting
 
 ```bash
+git clone https://github.com/emilpinski/content-agent
+cd content-agent-ui
+npm install
+cp .env.example .env.local
+# Fill in keys in .env.local (optional — users can provide their own via UI)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment variables (all optional — users can provide via UI)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+ANTHROPIC_API_KEY=sk-ant-...
+OPENROUTER_API_KEY=sk-or-v1-...
+TAVILY_API_KEY=tvly-...
+BRAVE_SEARCH_KEY=BSA...
+NEXT_PUBLIC_SUPABASE_URL=https://...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Rate limiting
 
-To learn more about Next.js, take a look at the following resources:
+5 requests per minute per IP (in-memory, resets on cold start).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Security
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- API keys validated by format before use (`sk-ant-*`, `sk-or-v1-*`)
+- Input length limited (topic: 300 chars, SEO phrase: 150 chars)
+- CSP headers configured
+- No key logging on server side
