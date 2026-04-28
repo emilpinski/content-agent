@@ -138,8 +138,6 @@ export default function Home() {
       };
       saveToHistory(item);
       setHistory(getHistory());
-      // Single-use keys — clear after successful generation
-      localStorage.removeItem("ca-settings");
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== "AbortError") {
         setStep("error");
