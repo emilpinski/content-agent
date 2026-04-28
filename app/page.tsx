@@ -60,6 +60,7 @@ export default function Home() {
   const [article, setArticle] = useState("");
   const [seoReport, setSeoReport] = useState("");
   const [imagePrompt, setImagePrompt] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("article");
   const [history, setHistory] = useState<HistoryItem[]>(() => typeof window !== "undefined" ? getHistory() : []);
   const [bulkCsv, setBulkCsv] = useState("");
@@ -98,21 +99,21 @@ export default function Home() {
 
       for (const line of lines) {
         if (!line.startsWith("data: ")) continue;
-        try {
-          const event = JSON.parse(line.slice(6));
-          if (event.type === "progress") {
-            if (event.step === "writer") setStep("writer");
-            else if (event.step === "seo") setStep("seo");
-            else if (event.step === "image_prompt") setStep("image_prompt");
-            else if (event.step === "done") setStep("done");
-          } else if (event.type === "result") {
-            resultArticle = event.article ?? "";
-            resultSeo = event.seoReport ?? "";
-            resultImage = event.imagePrompt ?? "";
-          } else if (event.type === "error") {
-            throw new Error(event.message);
-          }
-        } catch { /* skip malformed */ }
+        let event: Record<string, unknown>;
+        try { event = JSON.parse(line.slice(6)); } catch { continue; }
+
+        if (event.type === "progress") {
+          if (event.step === "writer") setStep("writer");
+          else if (event.step === "seo") setStep("seo");
+          else if (event.step === "image_prompt") setStep("image_prompt");
+          else if (event.step === "done") setStep("done");
+        } else if (event.type === "result") {
+          resultArticle = (event.article as string) ?? "";
+          resultSeo = (event.seoReport as string) ?? "";
+          resultImage = (event.imagePrompt as string) ?? "";
+        } else if (event.type === "error") {
+          throw new Error((event.message as string) ?? "Błąd generowania");
+        }
       }
     }
     return { article: resultArticle, seoReport: resultSeo, imagePrompt: resultImage };
@@ -120,7 +121,7 @@ export default function Home() {
 
   const generate = useCallback(async () => {
     if (!topic.trim() || !seoPhrase.trim()) return;
-    setStep("researcher"); setArticle(""); setSeoReport(""); setImagePrompt("");
+    setStep("researcher"); setArticle(""); setSeoReport(""); setImagePrompt(""); setErrorMsg("");
     abortRef.current = new AbortController();
     try {
       const result = await runGeneration(topic, seoPhrase, dryRun);
@@ -139,7 +140,10 @@ export default function Home() {
       // Single-use keys — clear after successful generation
       localStorage.removeItem("ca-settings");
     } catch (err: unknown) {
-      if (err instanceof Error && err.name !== "AbortError") setStep("error");
+      if (err instanceof Error && err.name !== "AbortError") {
+        setStep("error");
+        setErrorMsg(err.message || "Nieznany błąd");
+      }
     }
   }, [topic, seoPhrase, dryRun, runGeneration]);
 
@@ -265,6 +269,15 @@ export default function Home() {
                     {step === "seo" && "SEO Checker analizuje..."}
                     {step === "image_prompt" && "Image Prompt generuje..."}
                   </div>
+                </div>
+              )}
+
+              {step === "error" && !article && (
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.75rem", padding: "2rem" }}>
+                  <div style={{ fontSize: "2rem" }}>⚠️</div>
+                  <div style={{ fontWeight: 600, color: "#f87171" }}>Błąd generowania</div>
+                  <div style={{ fontSize: "0.82rem", color: "var(--muted)", textAlign: "center", maxWidth: 320, wordBreak: "break-word" }}>{errorMsg || "Sprawdź klucze API w Ustawieniach"}</div>
+                  <button onClick={() => setStep("idle")} style={{ marginTop: "0.5rem", background: "var(--border)", border: "none", borderRadius: 6, padding: "0.4rem 1rem", color: "var(--text)", fontSize: "0.8rem", cursor: "pointer" }}>Spróbuj ponownie</button>
                 </div>
               )}
 
