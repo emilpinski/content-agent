@@ -25,7 +25,7 @@ const MOCK_RESEARCH = `
 `;
 
 async function braveSearch(query: string, apiKey: string): Promise<string> {
-  const url = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=6&search_lang=pl`;
+  const url = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=6`;
   const res = await fetch(url, { headers: { "Accept": "application/json", "X-Subscription-Token": apiKey } });
   if (!res.ok) throw new Error(`Brave Search error: ${res.status}`);
   const data = await res.json() as { web?: { results?: { title: string; description: string; url: string }[] } };
@@ -52,9 +52,14 @@ export function makeResearcherNode(keys: GraphKeys) {
 
     let snippets = "";
     if (keys.searchKey) {
-      snippets = keys.searchProvider === "brave"
-        ? await braveSearch(query, keys.searchKey)
-        : await tavilySearch(query, keys.searchKey);
+      try {
+        snippets = keys.searchProvider === "brave"
+          ? await braveSearch(query, keys.searchKey)
+          : await tavilySearch(query, keys.searchKey);
+      } catch {
+        // Search failed — continue with LLM knowledge only
+        snippets = "";
+      }
     }
 
     const prompt = `Jesteś agentem badawczym. ${snippets ? `Na podstawie wyników wyszukiwania, wyodrębnij` : `Bazując na swojej wiedzy, przygotuj`} kluczowe fakty i punkty dla artykułu na temat: "${state.topic}" z frazą SEO: "${state.seoPhrase}".
