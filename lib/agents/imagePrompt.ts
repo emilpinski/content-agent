@@ -1,7 +1,9 @@
 import { ChatAnthropic } from "@langchain/anthropic";
 import type { ContentStateType } from "../state";
+import type { GraphKeys } from "../graph";
 
-export async function imagePromptNode(state: ContentStateType): Promise<Partial<ContentStateType>> {
+export function makeImagePromptNode(keys: GraphKeys) {
+  return async function imagePromptNode(state: ContentStateType): Promise<Partial<ContentStateType>> {
   if (state.dryRun) {
     return {
       imagePrompt: `Midjourney: A professional, warm-toned photo of a modern Polish service business, clean interior, natural light, shallow depth of field. Topic: ${state.topic}. Style: editorial photography, 4K, --ar 16:9 --style raw`,
@@ -10,7 +12,7 @@ export async function imagePromptNode(state: ContentStateType): Promise<Partial<
 
   const llm = new ChatAnthropic({
     model: "claude-haiku-4-5-20251001",
-    apiKey: process.env.ANTHROPIC_API_KEY!,
+    apiKey: keys.anthropicKey,
     maxTokens: 300,
   });
 
@@ -31,4 +33,5 @@ Format odpowiedzi (tylko to, nic więcej):
 
   const response = await llm.invoke(prompt);
   return { imagePrompt: response.content as string };
+  };
 }

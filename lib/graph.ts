@@ -1,16 +1,22 @@
 import { StateGraph, END } from "@langchain/langgraph";
 import { ContentState } from "./state";
-import { researcherNode } from "./agents/researcher";
-import { writerNode } from "./agents/writer";
-import { seoCheckerNode } from "./agents/seoChecker";
-import { imagePromptNode } from "./agents/imagePrompt";
+import { makeResearcherNode } from "./agents/researcher";
+import { makeWriterNode } from "./agents/writer";
+import { makeSeoCheckerNode } from "./agents/seoChecker";
+import { makeImagePromptNode } from "./agents/imagePrompt";
 
-export function buildGraph() {
+export interface GraphKeys {
+  anthropicKey: string;
+  searchProvider: string;
+  searchKey: string;
+}
+
+export function buildGraph(keys: GraphKeys) {
   const graph = new StateGraph(ContentState)
-    .addNode("researcher", researcherNode)
-    .addNode("writer", writerNode)
-    .addNode("seo_checker", seoCheckerNode)
-    .addNode("image_prompt", imagePromptNode)
+    .addNode("researcher", makeResearcherNode(keys))
+    .addNode("writer", makeWriterNode(keys))
+    .addNode("seo_checker", makeSeoCheckerNode(keys))
+    .addNode("image_prompt", makeImagePromptNode(keys))
     .addEdge("__start__", "researcher")
     .addEdge("researcher", "writer")
     .addEdge("writer", "seo_checker")

@@ -68,10 +68,16 @@ export default function Home() {
   const abortRef = useRef<AbortController | null>(null);
 
   const runGeneration = useCallback(async (t: string, s: string, dry: boolean): Promise<{ article: string; seoReport: string; imagePrompt: string }> => {
+    let apiKeys: Record<string, string> | undefined;
+    try {
+      const saved = localStorage.getItem("ca-settings");
+      if (saved) apiKeys = JSON.parse(saved);
+    } catch { /* ignore */ }
+
     const res = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic: t, seoPhrase: s, dryRun: dry }),
+      body: JSON.stringify({ topic: t, seoPhrase: s, dryRun: dry, apiKeys }),
       signal: abortRef.current?.signal,
     });
 

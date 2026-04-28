@@ -1,64 +1,55 @@
 import { ChatAnthropic } from "@langchain/anthropic";
 import type { ContentStateType } from "../state";
+import type { GraphKeys } from "../graph";
 
 const MOCK_ARTICLE = `# Jak wybrać najlepszego fryzjera w Twoim mieście
 
-Wybór dobrego fryzjera to decyzja, która ma ogromny wpływ na Twój wygląd i samopoczucie. W tym artykule podpowiemy, na co zwrócić uwagę.
+Wybór dobrego fryzjera to decyzja, która ma ogromny wpływ na Twój wygląd i samopoczucie.
 
 ## Dlaczego warto poświęcić czas na wybór fryzjera?
 
-Dobry fryzjer to nie tylko osoba, która tnie włosy. To specjalista, który rozumie Twoje potrzeby i pomaga wyglądać najlepiej jak możesz.
+Dobry fryzjer to specjalista, który rozumie Twoje potrzeby.
 
 ## Na co zwrócić uwagę?
 
 ### 1. Opinie i rekomendacje
-
-Zacznij od sprawdzenia opinii w internecie. Google Maps, Facebook i portale branżowe to świetne miejsca do weryfikacji jakości usług.
+Zacznij od sprawdzenia opinii w Google Maps i na Facebooku.
 
 ### 2. Portfolio prac
-
-Dobry fryzjer powinien mieć portfolio swoich prac — czy to na Instagramie, czy na stronie salonu.
+Dobry fryzjer powinien mieć portfolio na Instagramie lub stronie salonu.
 
 ### 3. Cena vs. jakość
-
-Najtańszy nie zawsze oznacza najgorszy, a najdroższy niekoniecznie najlepszy. Szukaj balansu między ceną a jakością.
+Szukaj balansu między ceną a jakością.
 
 ## Podsumowanie
 
-Wybierając fryzjera, kieruj się opiniami, portfolio i pierwszym wrażeniem z konsultacji. Dobry specjalista zawsze znajdzie czas na omówienie Twoich oczekiwań.
+Kieruj się opiniami, portfolio i pierwszym wrażeniem z konsultacji.
 
-*Ten artykuł powstał w trybie dry-run — to przykładowa treść.*`;
+*Tryb dry-run — przykładowa treść.*`;
 
-export async function writerNode(state: ContentStateType): Promise<Partial<ContentStateType>> {
-  if (state.dryRun) {
-    return { articleMd: MOCK_ARTICLE };
-  }
+export function makeWriterNode(keys: GraphKeys) {
+  return async function writerNode(state: ContentStateType): Promise<Partial<ContentStateType>> {
+    if (state.dryRun) return { articleMd: MOCK_ARTICLE };
 
-  const llm = new ChatAnthropic({
-    model: "claude-sonnet-4-6",
-    apiKey: process.env.ANTHROPIC_API_KEY!,
-    maxTokens: 3000,
-  });
+    const llm = new ChatAnthropic({ model: "claude-sonnet-4-6", apiKey: keys.anthropicKey, maxTokens: 3000 });
 
-  const prompt = `Jesteś ekspertem content marketingu. Napisz artykuł blogowy po polsku na temat: "${state.topic}".
+    const prompt = `Jesteś ekspertem content marketingu. Napisz artykuł blogowy po polsku na temat: "${state.topic}".
 
-Fraza SEO do zoptymalizowania: "${state.seoPhrase}"
+Fraza SEO: "${state.seoPhrase}"
 
-Notatki badawcze do wykorzystania:
+Notatki badawcze:
 ${state.researchNotes}
 
 Wymagania:
 - Długość: 1200-1500 słów
-- Fraza SEO "${state.seoPhrase}" musi pojawić się w: tytule (H1), pierwszym akapicie, co najmniej 2 nagłówkach H2/H3
-- Struktura: H1 → wprowadzenie → 4-6 sekcji H2 → podsumowanie
-- Styl: profesjonalny, ale przystępny. Pisz do polskiego czytelnika.
-- Każda sekcja H2 powinna mieć 150-250 słów
-- Używaj list punktowanych tam gdzie pasuje
-- Zakończ wezwaniem do działania (CTA)
+- Fraza SEO "${state.seoPhrase}" w: tytule H1, pierwszym akapicie, ≥2 nagłówkach H2/H3
+- Struktura: H1 → wprowadzenie → 4-6 sekcji H2 → podsumowanie z CTA
+- Styl: profesjonalny, przystępny, dla polskiego czytelnika
 - Format: Markdown
 
-Napisz TYLKO artykuł w Markdown, bez żadnych komentarzy przed ani po.`;
+Napisz TYLKO artykuł w Markdown.`;
 
-  const response = await llm.invoke(prompt);
-  return { articleMd: response.content as string };
+    const response = await llm.invoke(prompt);
+    return { articleMd: response.content as string };
+  };
 }
