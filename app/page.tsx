@@ -136,6 +136,8 @@ export default function Home() {
       };
       saveToHistory(item);
       setHistory(getHistory());
+      // Single-use keys — clear after successful generation
+      localStorage.removeItem("ca-settings");
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== "AbortError") setStep("error");
     }
@@ -184,7 +186,7 @@ export default function Home() {
 
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem" }}>
         {mode === "single" ? (
-          <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: "1.5rem" }}>
+          <div className="content-grid" style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: "1.5rem" }}>
             {/* LEFT */}
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               {/* Form */}
@@ -343,6 +345,9 @@ export default function Home() {
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         input:focus, textarea:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
         * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+        @media (max-width: 768px) {
+          .content-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
     </div>
   );

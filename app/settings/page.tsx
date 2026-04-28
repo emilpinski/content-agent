@@ -5,12 +5,13 @@ import Link from "next/link";
 
 interface Settings {
   anthropicKey: string;
+  openrouterKey: string;
   searchProvider: "tavily" | "brave";
   tavilyKey: string;
   braveKey: string;
 }
 
-const DEFAULT: Settings = { anthropicKey: "", searchProvider: "brave", tavilyKey: "", braveKey: "" };
+const DEFAULT: Settings = { anthropicKey: "", openrouterKey: "", searchProvider: "brave", tavilyKey: "", braveKey: "" };
 const STORAGE_KEY = "ca-settings";
 
 function loadSettings(): Settings {
@@ -67,7 +68,8 @@ export default function SettingsPage() {
             Klucze API
           </h2>
 
-          {input("Anthropic API Key *", "anthropicKey", "sk-ant-...", "Wymagany. Pobierz z console.anthropic.com")}
+          {input("OpenRouter API Key (zalecany)", "openrouterKey", "sk-or-v1-...", "Pobierz z openrouter.ai — dostęp do wielu modeli")}
+          {input("Anthropic API Key (alternatywnie)", "anthropicKey", "sk-ant-...", "Bezpośredni dostęp do modeli Anthropic — console.anthropic.com")}
 
           <div style={{ marginBottom: "1.5rem" }}>
             <label style={{ display: "block", marginBottom: "0.6rem", fontSize: "0.82rem", color: "var(--muted)" }}>
@@ -90,7 +92,7 @@ export default function SettingsPage() {
             : input("Tavily API Key", "tavilyKey", "tvly-...", "Pobierz z tavily.com (free: 1000 req/mies.)")}
 
           <div style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "0.75rem 1rem", marginBottom: "1.5rem", fontSize: "0.8rem", color: "#a5b4fc" }}>
-            Klucze są przechowywane tylko w localStorage Twojej przeglądarki — nie są wysyłane na serwer.
+            Klucze są przesyłane do serwera tylko podczas generowania i nigdzie nie są zapisywane trwale. Są automatycznie usuwane z przeglądarki po każdym użyciu (jednorazowe).
           </div>
 
           <button onClick={save} style={{ width: "100%", background: saved ? "var(--success)" : "linear-gradient(135deg, #6366f1, #8b5cf6)", border: "none", borderRadius: 8, padding: "0.75rem", color: "#fff", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", transition: "background 0.3s" }}>
@@ -101,10 +103,11 @@ export default function SettingsPage() {
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "1.5rem", marginTop: "1rem" }}>
           <h3 style={{ margin: "0 0 0.75rem", fontSize: "0.82rem", fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Jak zacząć</h3>
           <ol style={{ margin: 0, paddingLeft: "1.25rem", fontSize: "0.82rem", color: "#94a3b8", lineHeight: 2 }}>
-            <li>Pobierz Anthropic API key z <strong style={{ color: "var(--text)" }}>console.anthropic.com</strong></li>
+            <li>Pobierz OpenRouter key z <strong style={{ color: "var(--text)" }}>openrouter.ai</strong> (lub Anthropic key z console.anthropic.com)</li>
             <li>Zarejestruj się na <strong style={{ color: "var(--text)" }}>brave.com/search/api</strong> (lub tavily.com)</li>
             <li>Wklej klucze powyżej i zapisz</li>
             <li>Wróć na stronę główną i generuj artykuły</li>
+            <li>Klucze są <strong style={{ color: "var(--text)" }}>automatycznie usuwane</strong> po każdym generowaniu</li>
           </ol>
         </div>
       </div>
