@@ -92,7 +92,7 @@ export default function SettingsPage() {
             : input("Tavily API Key", "tavilyKey", "tvly-...", "Pobierz z tavily.com (free: 1000 req/mies.)")}
 
           <div style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "0.75rem 1rem", marginBottom: "1.5rem", fontSize: "0.8rem", color: "#a5b4fc" }}>
-            Klucze są przesyłane do serwera tylko podczas generowania i nigdzie nie są zapisywane trwale. Są automatycznie usuwane z przeglądarki po każdym użyciu (jednorazowe).
+            Klucze są zapisywane lokalnie w Twojej przeglądarce (localStorage) i przesyłane do serwera tylko podczas generowania. Serwer ich nie przechowuje. Klucze są dostępne wyłącznie dla tej domeny.
           </div>
 
           <button onClick={save} style={{ width: "100%", background: saved ? "var(--success)" : "linear-gradient(135deg, #6366f1, #8b5cf6)", border: "none", borderRadius: 8, padding: "0.75rem", color: "#fff", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", transition: "background 0.3s" }}>
