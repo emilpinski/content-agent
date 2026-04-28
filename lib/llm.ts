@@ -15,7 +15,7 @@ export function makeLLM(keys: GraphKeys, model: string, maxTokens: number) {
     const orModel = OR_MODELS[model] ?? (model.includes("/") ? model : `anthropic/${model}`);
     return new ChatOpenAI({
       model: orModel,
-      openAIApiKey: keys.openrouterKey,
+      apiKey: keys.openrouterKey,
       maxTokens,
       configuration: {
         baseURL: "https://openrouter.ai/api/v1",
