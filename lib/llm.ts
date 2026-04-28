@@ -1,7 +1,9 @@
 import { ChatAnthropic } from "@langchain/anthropic";
+import { ChatOpenAI } from "@langchain/openai";
 import type { GraphKeys } from "./graph";
 
-// OpenRouter uses stable model slugs — map Anthropic IDs to OR equivalents
+// OpenRouter uses OpenAI-compatible API (/chat/completions), not Anthropic native (/messages)
+// Map Anthropic model IDs to OpenRouter slugs
 const OR_MODELS: Record<string, string> = {
   "claude-haiku-4-5-20251001": "anthropic/claude-3.5-haiku-20241022",
   "claude-sonnet-4-6":         "anthropic/claude-3.5-sonnet-20241022",
@@ -11,11 +13,11 @@ const OR_MODELS: Record<string, string> = {
 export function makeLLM(keys: GraphKeys, model: string, maxTokens: number) {
   if (keys.openrouterKey) {
     const orModel = OR_MODELS[model] ?? (model.includes("/") ? model : `anthropic/${model}`);
-    return new ChatAnthropic({
+    return new ChatOpenAI({
       model: orModel,
-      anthropicApiKey: keys.openrouterKey,
+      openAIApiKey: keys.openrouterKey,
       maxTokens,
-      clientOptions: {
+      configuration: {
         baseURL: "https://openrouter.ai/api/v1",
         defaultHeaders: {
           "HTTP-Referer": "https://content-agent-ui.vercel.app",
